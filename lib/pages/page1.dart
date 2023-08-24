@@ -50,8 +50,7 @@ class EventDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(event.name)),
-      bottomNavigationBar: null, // Set bottomNavigationBar to null
-      body: SingleChildScrollView(
+        body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,24 +66,91 @@ class EventDetailsPage extends StatelessWidget {
                 ),
               ),
             ),
-            Text('Type: ${event.type}'),
-            Text('Name: ${event.name}'),
-            Text('Date: ${event.date}'),
-            Text('Time: ${event.time}'),
-            Text('Venue: ${event.venue}'),
+            Container(
+              decoration:
+              BoxDecoration(color:
+              Colors.yellow, borderRadius:
+              BorderRadius.circular(8)),
+              padding:
+              EdgeInsets.symmetric(horizontal:
+              8, vertical:
+              4),
+              child:
+              Text(event.type, style:
+              TextStyle(fontSize:
+              18)),
+            ),
+            Center(child: Text(event.name, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold))),
+            SizedBox(height: 8),
+            Row(
+              children: [
+                Container(
+                    decoration:
+                    BoxDecoration(shape:
+                    BoxShape.circle, color:
+                    Colors.grey[200]),
+                    padding:
+                    EdgeInsets.all(8),
+                    child:
+                    Icon(Icons.event, size:
+                    32)),
+                SizedBox(width:
+                8),
+                Column(
+                  crossAxisAlignment:
+                  CrossAxisAlignment.start,
+                  children: [
+                    Text(event.date, style:
+                    TextStyle(fontSize:
+                    18, fontWeight:
+                    FontWeight.bold)),
+                    SizedBox(height:
+                    8),
+                    Text(event.time, style:
+                    TextStyle(fontSize:
+                    18)),
+                  ],
+                ),
+              ],
+            ),
+            SizedBox(height: 8),
+            Text('Venue: ${event.venue}', style: TextStyle(fontSize: 18)),
             if (event.type == 'Physical')
-              Text('Location: ${event.venue}')
+              Text('Location: ${event.venue}', style: TextStyle(fontSize: 18))
             else if (event.type == 'Online')
-              Text('Online Platform: ${event.venue}'),
-            if (event.fee.isNotEmpty) Text('Fee: ${event.fee}'),
-            if (event.speaker.isNotEmpty) Text('Speaker: ${event.speaker}'),
-            Text('Description: ${event.description}'),
-            Text('Contact Person: ${event.contactPerson}'),
-            TextButton(
-              onPressed: () {
-                // Handle ticket action
-              },
-              child: Text('Get Tickets'),
+              Text('Online Platform: ${event.venue}',
+                  style: TextStyle(fontSize: 18)),
+            if (event.fee.isNotEmpty)
+              SizedBox(height: 8),
+              Text('Fee: ${event.fee}', style: TextStyle(fontSize: 18)),
+            SizedBox(height: 8),
+            if (event.speaker.isNotEmpty)
+            Text('Speaker: ${event.speaker}', style: TextStyle(fontSize: 18)),
+            SizedBox(height: 8),
+            Text('About this event:', style: TextStyle(fontSize: 18)),
+            Container(
+              margin:
+              EdgeInsets.only(left: 20.0, top: 10.0, bottom: 10.0), // Add margin here
+              child:
+              Text(event.description, style: TextStyle(fontSize: 16)),
+            ),
+            Text('Contact Person:', style: TextStyle(fontSize: 18)),
+            Container(
+              margin:
+              EdgeInsets.only(left: 20.0, top: 10.0, bottom: 10.0), // Add margin here
+              child:
+              Text('${event.contactPerson}', style: TextStyle(fontSize: 16)),
+            ),
+            ElevatedButton(
+              onPressed:
+                  () {}, // Change text color to white
+              style:
+              ButtonStyle(backgroundColor:
+              MaterialStateProperty.all<Color>(Colors.blue)), // Handle ticket action
+              child:
+              Text('Get Tickets', style:
+              TextStyle(color:
+              Colors.white)), // Change button color to blue
             ),
           ],
         ),
@@ -327,7 +393,7 @@ class CustomListItemExample extends StatelessWidget {
       Event(
         poster: 'https://img.freepik.com/premium-vector/modern-elegant-music-festival-poster-vector-template_115083-346.jpg?size=626&ext=jpg',
         type: 'Meeting',
-        name: 'Team Meeting',
+        name: 'Reloaded 1 of 694 libraries in 2,429ms (compile: 79 ms, reload: 832 ms, reassemble: 1277 ms).',
         date: '2023-11-05',
         time: '3:00 PM',
         venue: 'Office Conference Room',

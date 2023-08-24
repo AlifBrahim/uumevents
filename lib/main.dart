@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'pages/page1.dart';
 import 'pages/page2.dart';
@@ -27,6 +28,7 @@ class NavigationExample extends StatefulWidget {
 
 class _NavigationExampleState extends State<NavigationExample> {
   int currentPageIndex = 0;
+
   Widget _buildPage(int index) {
     switch (index) {
       case 0:
@@ -48,59 +50,41 @@ class _NavigationExampleState extends State<NavigationExample> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey,
-              blurRadius: 4.0,
-              spreadRadius: 2.0,
-            ),
-          ],
-        ),
-        child: NavigationBar(
-          backgroundColor: Colors.white,
-          height: 50,
-          elevation: 1000,
-          shadowColor: Colors.red,
-          onDestinationSelected: (int index) {
-            setState(() {
-              currentPageIndex = index;
-            });
-          },
-          indicatorColor: Colors.amber[800],
-          selectedIndex: currentPageIndex,
-          destinations: const <Widget>[
-            NavigationDestination(
-              selectedIcon: Icon(Icons.home),
-              icon: Icon(Icons.home_outlined),
-              label: '',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.search),
-              selectedIcon: Icon(Icons.search_outlined),
-              label: '',
-            ),
-            NavigationDestination(
-              selectedIcon: Icon(Icons.favorite),
-              icon: Icon(Icons.favorite_border),
-              label: '',
-            ),
-            NavigationDestination(
-              selectedIcon: Icon(Icons.width_full),
-              icon: Icon(Icons.width_full_outlined),
-              label: '',
-            ),
-            NavigationDestination(
-              selectedIcon: Icon(Icons.account_circle),
-              icon: Icon(Icons.account_circle_outlined),
-              label: '',
-            ),
-          ],
-        ),
+    return CupertinoTabScaffold(
+      tabBar: CupertinoTabBar(
+        height: 35,
+        backgroundColor: Colors.white,
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: '',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.search),
+            label: '',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite),
+            label: '',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.width_full),
+            label: '',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_circle),
+            label: '',
+          ),
+        ],
       ),
-      body: _buildPage(currentPageIndex),
+      tabBuilder: (BuildContext context, int index) {
+        return CupertinoTabView(
+          builder: (BuildContext context) {
+            return _buildPage(index);
+          },
+        );
+      },
     );
   }
+
 }

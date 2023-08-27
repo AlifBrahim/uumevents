@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
-void main() => runApp(const Page1());
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class Page1 extends StatelessWidget {
   const Page1({Key? key});
@@ -40,7 +41,24 @@ class Event {
     required this.contactPerson,
     required this.tickets,
   });
+  // Add a factory constructor to parse JSON data
+  factory Event.fromJson(Map<String, dynamic> json) {
+    return Event(
+      poster: json['poster'],
+      type: json['type'],
+      name: json['name'],
+      date: json['date'],
+      time: json['time'],
+      venue: json['venue'],
+      fee: json['fee'],
+      speaker: json['speaker'],
+      description: json['description'],
+      contactPerson: json['contactPerson'],
+      tickets: json['tickets'],
+    );
+  }
 }
+
 class EventDetailsPage extends StatelessWidget {
   final Event event;
 
@@ -319,124 +337,177 @@ class _LoveAndShareButtonState extends State<LoveAndShareButton> {
   }
 }
 
-class CustomListItemExample extends StatelessWidget {
+// class CustomListItemExample extends StatelessWidget {
+//   const CustomListItemExample({Key? key});
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final List<Event> events = [
+//       Event(
+//         poster: 'https://img.freepik.com/free-vector/flat-design-business-workshop-poster-template_23-2149394723.jpg?w=2000',
+//         type: 'Workshop',
+//         name: 'Dives into Music',
+//         date: '2023-08-30',
+//         time: '7:30 PM',
+//         venue: 'Indigo Nightclub',
+//         fee: '\$20',
+//         speaker: 'John Doe',
+//         description: 'A workshop on music appreciation.',
+//         contactPerson: 'Alice Johnson',
+//         tickets: 'Buy Now',
+//       ),
+//       Event(
+//         poster: 'https://marketplace.canva.com/EAFBiag7Bos/1/0/1131w/canva-black-and-pink-glow-party-night-poster-oeRmI0EKb_I.jpg',
+//         type: 'Competition',
+//         name: 'Rock the Night',
+//         date: '2023-09-05',
+//         time: '8:00 AM',
+//         venue: 'The Roxy Theatre',
+//         fee: '\$10',
+//         speaker: '',
+//         description: 'A rock music competition.',
+//         contactPerson: 'Bob Smith',
+//         tickets: 'Register',
+//       ),
+//       Event(
+//         poster: 'https://img.freepik.com/free-vector/new-year-2021-party-poster-template_23-2148776977.jpg?size=626&ext=jpg',
+//         type: 'Seminar',
+//         name: 'Jazz Festival',
+//         date: '2023-09-15',
+//         time: '6:00 PM',
+//         venue: 'Central Park',
+//         fee: '\$15',
+//         speaker: 'Jane Smith',
+//         description: 'A seminar on jazz music history.',
+//         contactPerson: 'Eva Williams',
+//         tickets: 'Get Tickets',
+//       ),
+//       Event(
+//         poster: 'https://img.freepik.com/free-vector/music-event-poster-template-with-abstract-shapes_1361-1316.jpg?size=626&ext=jpg',
+//         type: 'Leisure',
+//         name: 'Relaxation Retreat',
+//         date: '2023-10-02',
+//         time: '1:00 PM',
+//         venue: 'Tranquil Valley Resort',
+//         fee: '\$50',
+//         speaker: '',
+//         description: 'A day of relaxation and mindfulness.',
+//         contactPerson: 'Michael Brown',
+//         tickets: 'Book Now',
+//       ),
+//       Event(
+//         poster: 'https://img.freepik.com/premium-vector/music-event-poster-template-with-photo_23-2148577977.jpg?size=626&ext=jpg',
+//         type: 'CSR',
+//         name: 'Community Cleanup',
+//         date: '2023-10-10',
+//         time: '9:00 AM',
+//         venue: 'Local Park',
+//         fee: 'Free',
+//         speaker: '',
+//         description: 'Join us in cleaning up the community!',
+//         contactPerson: 'Sarah Green',
+//         tickets: 'Join',
+//       ),
+//       Event(
+//         poster: 'https://img.freepik.com/premium-vector/modern-elegant-music-festival-poster-vector-template_115083-346.jpg?size=626&ext=jpg',
+//         type: 'Meeting',
+//         name: 'Reloaded 1 of 694 libraries in 2,429ms (compile: 79 ms, reload: 832 ms, reassemble: 1277 ms).',
+//         date: '2023-11-05',
+//         time: '3:00 PM',
+//         venue: 'Office Conference Room',
+//         fee: 'N/A',
+//         speaker: '',
+//         description: 'Monthly team meeting.',
+//         contactPerson: 'David Jones',
+//         tickets: 'N/A',
+//       ),
+//       Event(
+//         poster: 'https://img.freepik.com/free-psd/digital-marketing-live-webinar-corporate-social-media-post-template_202595-418.jpg?size=626&ext=jpg',
+//         type: 'Talk',
+//         name: 'Tech Talk',
+//         date: '2023-12-12',
+//         time: '10:00 AM',
+//         venue: 'Online (Zoom)',
+//         fee: 'Free',
+//         speaker: 'Tech Guru',
+//         description: 'A talk on the latest technology trends.',
+//         contactPerson: 'Megan White',
+//         tickets: 'Register Now',
+//       ),
+//       Event(
+//         poster: 'https://img.freepik.com/free-vector/modern-music-event-poster-with-abstract-brush-stroke_1361-1917.jpg?size=626&ext=jpg',
+//         type: 'Workshop',
+//         name: 'Art Workshop',
+//         date: '2023-01-20',
+//         time: '2:30 PM',
+//         venue: 'Local Art Studio',
+//         fee: '\$25',
+//         speaker: 'Art Expert',
+//         description: 'Learn to create beautiful art!',
+//         contactPerson: 'Olivia Davis',
+//         tickets: 'Sign Up',
+//       ),
+//     ];
+//
+//     // Sort the events by date in ascending order
+//     events.sort((a, b) => a.date.compareTo(b.date));
+//
+//     return Scaffold(
+//       appBar: AppBar(title: const Text('Upcoming Events')),
+//       body: ListView.builder(
+//         padding: const EdgeInsets.all(10.0),
+//         itemCount: events.length,
+//         itemBuilder: (BuildContext context, int index) {
+//           return CustomListItemTwo(event: events[index]);
+//         },
+//       ),
+//     );
+//   }
+// }
+
+class CustomListItemExample extends StatefulWidget {
   const CustomListItemExample({Key? key});
 
   @override
+  _CustomListItemExampleState createState() => _CustomListItemExampleState();
+}
+
+class _CustomListItemExampleState extends State<CustomListItemExample> {
+  List<Event> events = []; // Initialize an empty list to store events
+  bool isLoading = true; // Add a new state variable to track loading status
+
+  @override
+  void initState() {
+    super.initState();
+    fetchEvents(); // Fetch events when the widget is initialized
+  }
+
+  // Function to fetch events from the server
+  Future<void> fetchEvents() async {
+    try {
+      final response = await http.get(Uri.parse('http://146.190.102.198:3000/events'));
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        setState(() {
+          events = data.map((eventData) => Event.fromJson(eventData)).toList();
+          isLoading = false; // Set isLoading to false when data is loaded
+        });
+      } else {
+        print('Failed to load events. Status code: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error fetching events: $error');
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final List<Event> events = [
-      Event(
-        poster: 'https://img.freepik.com/free-vector/flat-design-business-workshop-poster-template_23-2149394723.jpg?w=2000',
-        type: 'Workshop',
-        name: 'Dives into Music',
-        date: '2023-08-30',
-        time: '7:30 PM',
-        venue: 'Indigo Nightclub',
-        fee: '\$20',
-        speaker: 'John Doe',
-        description: 'A workshop on music appreciation.',
-        contactPerson: 'Alice Johnson',
-        tickets: 'Buy Now',
-      ),
-      Event(
-        poster: 'https://marketplace.canva.com/EAFBiag7Bos/1/0/1131w/canva-black-and-pink-glow-party-night-poster-oeRmI0EKb_I.jpg',
-        type: 'Competition',
-        name: 'Rock the Night',
-        date: '2023-09-05',
-        time: '8:00 AM',
-        venue: 'The Roxy Theatre',
-        fee: '\$10',
-        speaker: '',
-        description: 'A rock music competition.',
-        contactPerson: 'Bob Smith',
-        tickets: 'Register',
-      ),
-      Event(
-        poster: 'https://img.freepik.com/free-vector/new-year-2021-party-poster-template_23-2148776977.jpg?size=626&ext=jpg',
-        type: 'Seminar',
-        name: 'Jazz Festival',
-        date: '2023-09-15',
-        time: '6:00 PM',
-        venue: 'Central Park',
-        fee: '\$15',
-        speaker: 'Jane Smith',
-        description: 'A seminar on jazz music history.',
-        contactPerson: 'Eva Williams',
-        tickets: 'Get Tickets',
-      ),
-      Event(
-        poster: 'https://img.freepik.com/free-vector/music-event-poster-template-with-abstract-shapes_1361-1316.jpg?size=626&ext=jpg',
-        type: 'Leisure',
-        name: 'Relaxation Retreat',
-        date: '2023-10-02',
-        time: '1:00 PM',
-        venue: 'Tranquil Valley Resort',
-        fee: '\$50',
-        speaker: '',
-        description: 'A day of relaxation and mindfulness.',
-        contactPerson: 'Michael Brown',
-        tickets: 'Book Now',
-      ),
-      Event(
-        poster: 'https://img.freepik.com/premium-vector/music-event-poster-template-with-photo_23-2148577977.jpg?size=626&ext=jpg',
-        type: 'CSR',
-        name: 'Community Cleanup',
-        date: '2023-10-10',
-        time: '9:00 AM',
-        venue: 'Local Park',
-        fee: 'Free',
-        speaker: '',
-        description: 'Join us in cleaning up the community!',
-        contactPerson: 'Sarah Green',
-        tickets: 'Join',
-      ),
-      Event(
-        poster: 'https://img.freepik.com/premium-vector/modern-elegant-music-festival-poster-vector-template_115083-346.jpg?size=626&ext=jpg',
-        type: 'Meeting',
-        name: 'Reloaded 1 of 694 libraries in 2,429ms (compile: 79 ms, reload: 832 ms, reassemble: 1277 ms).',
-        date: '2023-11-05',
-        time: '3:00 PM',
-        venue: 'Office Conference Room',
-        fee: 'N/A',
-        speaker: '',
-        description: 'Monthly team meeting.',
-        contactPerson: 'David Jones',
-        tickets: 'N/A',
-      ),
-      Event(
-        poster: 'https://img.freepik.com/free-psd/digital-marketing-live-webinar-corporate-social-media-post-template_202595-418.jpg?size=626&ext=jpg',
-        type: 'Talk',
-        name: 'Tech Talk',
-        date: '2023-12-12',
-        time: '10:00 AM',
-        venue: 'Online (Zoom)',
-        fee: 'Free',
-        speaker: 'Tech Guru',
-        description: 'A talk on the latest technology trends.',
-        contactPerson: 'Megan White',
-        tickets: 'Register Now',
-      ),
-      Event(
-        poster: 'https://img.freepik.com/free-vector/modern-music-event-poster-with-abstract-brush-stroke_1361-1917.jpg?size=626&ext=jpg',
-        type: 'Workshop',
-        name: 'Art Workshop',
-        date: '2023-01-20',
-        time: '2:30 PM',
-        venue: 'Local Art Studio',
-        fee: '\$25',
-        speaker: 'Art Expert',
-        description: 'Learn to create beautiful art!',
-        contactPerson: 'Olivia Davis',
-        tickets: 'Sign Up',
-      ),
-    ];
-
-    // Sort the events by date in ascending order
-    events.sort((a, b) => a.date.compareTo(b.date));
-
     return Scaffold(
       appBar: AppBar(title: const Text('Upcoming Events')),
-      body: ListView.builder(
+      body: isLoading // Show progress indicator when isLoading is true
+          ? Center(child: CircularProgressIndicator())
+          : ListView.builder(
         padding: const EdgeInsets.all(10.0),
         itemCount: events.length,
         itemBuilder: (BuildContext context, int index) {
@@ -446,3 +517,4 @@ class CustomListItemExample extends StatelessWidget {
     );
   }
 }
+

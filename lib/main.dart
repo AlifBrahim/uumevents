@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'pages/page1.dart';
 import 'pages/page2.dart';
@@ -6,12 +5,10 @@ import 'pages/page3.dart';
 import 'pages/page4.dart';
 import 'pages/page5.dart';
 
-/// Flutter code sample for [NavigationBar].
-
 void main() => runApp(const NavigationBarApp());
 
 class NavigationBarApp extends StatelessWidget {
-  const NavigationBarApp({super.key});
+  const NavigationBarApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +17,7 @@ class NavigationBarApp extends StatelessWidget {
 }
 
 class NavigationExample extends StatefulWidget {
-  const NavigationExample({super.key});
+  const NavigationExample({Key? key}) : super(key: key);
 
   @override
   State<NavigationExample> createState() => _NavigationExampleState();
@@ -28,6 +25,7 @@ class NavigationExample extends StatefulWidget {
 
 class _NavigationExampleState extends State<NavigationExample> {
   int currentPageIndex = 0;
+  Key page3Key = UniqueKey(); // Add a key for the Page3 widget
 
   Widget _buildPage(int index) {
     switch (index) {
@@ -36,55 +34,60 @@ class _NavigationExampleState extends State<NavigationExample> {
       case 1:
         return Page2();
       case 2:
-        return Page3();
+        return Page3(key: page3Key); // Pass the key to the Page3 widget
       case 3:
         return Page4();
       case 4:
         return Page5();
-    // Add cases for other pages as needed
       default:
-        return Container(); // Handle an invalid index gracefully
+        return Container();
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
-    return CupertinoTabScaffold(
-      tabBar: CupertinoTabBar(
-        height: 35,
-        backgroundColor: Colors.white,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.width_full),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle),
-            label: '',
-          ),
-        ],
-      ),
-      tabBuilder: (BuildContext context, int index) {
-        return CupertinoTabView(
-          builder: (BuildContext context) {
-            return _buildPage(index);
+    return Scaffold(
+      bottomNavigationBar: Material(
+        elevation: 25.0,
+        child: NavigationBar(
+          elevation: 25.0,
+          labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
+          backgroundColor: Colors.white,
+          height: 40,
+          onDestinationSelected: (int index) {
+            setState(() {
+              currentPageIndex = index;
+              if (index == 2) {
+                page3Key = UniqueKey();
+              }
+            });
           },
-        );
-      },
+          selectedIndex: currentPageIndex,
+          destinations: const <NavigationDestination>[
+            NavigationDestination(
+              icon: Icon(Icons.home),
+              label: 'Home',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.search),
+              label: 'Search',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.favorite),
+              label: 'Favorites',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.width_full),
+              label: 'Tickets',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.account_circle),
+              label: 'Account',
+            ),
+          ],
+        ),
+      ),
+      body: _buildPage(currentPageIndex),
     );
   }
-
 }

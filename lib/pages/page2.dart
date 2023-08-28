@@ -1,106 +1,106 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:uumevents/pages/page1.dart';
 
-class Page2 extends StatelessWidget {
+class Page2 extends StatefulWidget {
+  const Page2({Key? key});
+
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Sintok',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(title: 'Sintok'),
-    );
+  _Page2State createState() => _Page2State();
+}
+
+class _Page2State extends State<Page2> {
+  final TextEditingController _searchController = TextEditingController();
+  List<Event> events = [];
+  List<Event> filteredEvents = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchEvents();
   }
-}
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key, required this.title}) : super(key: key);
+  // Function to fetch events from the server
+  Future<void> fetchEvents() async {
+    try {
+      final response =
+      await http.get(Uri.parse('http://146.190.102.198:3000/events'));
 
-  final String title;
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        setState(() {
+          events = data.map((eventData) => Event.fromJson(eventData)).toList();
+          filteredEvents = events;
+        });
+      } else {
+        print('Failed to load events. Status code: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error fetching events: $error');
+    }
+  }
 
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _selectedIndex = 0;
-  static const TextStyle optionStyle =
-  TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-  static const List<Widget> _widgetOptions = <Widget>[
-    Text(
-      'Events',
-      style: optionStyle,
-    ),
-    Text(
-      'This week',
-      style: optionStyle,
-    ),
-    Text(
-      'This month',
-      style: optionStyle,
-    ),
-    Text(
-      'Business',
-      style: optionStyle,
-    ),
-    Text(
-      'Ultrasounds',
-      style: optionStyle,
-    ),
-  ];
-
-  void _onItemTapped(int index) {
+  void _onSearchTextChanged(String text) {
     setState(() {
-      _selectedIndex = index;
+      filteredEvents = events
+          .where((event) => event.name.toLowerCase().contains(text.toLowerCase()))
+          .toList();
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(48.0),
-          child: Padding(
-            padding: EdgeInsets.all(8.0),
-            child: TextField(
-              decoration:
-              InputDecoration(hintText: "Start searching...", border: OutlineInputBorder()),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            elevation: 0,
+            backgroundColor: Colors.white,
+            title: Center(
+              child: Text(
+                'Search Events',
+                style: TextStyle(color: Colors.black),
+              ),
+            ),
+            floating: true,
+            pinned: true,
+            bottom: PreferredSize(
+              preferredSize: Size.fromHeight(64),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SingleChildScrollView( // Add this line
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 16), // Add this line
+                      hintText: 'Search...',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    onChanged: _onSearchTextChanged,
+                  ),
+
+                ),
+              ),
             ),
           ),
-        ),
-      ),
-      body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.event),
-            label: 'Events',
+
+
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+                  (BuildContext context, int index) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16), // Add this line
+                  child: CustomListItemTwo(event: filteredEvents[index]),
+                );
+              },
+              childCount: filteredEvents.length,
+            ),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_today),
-            label: 'This week',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_view_day),
-            label: 'This month',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.business_center),
-            label: 'Business',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.healing),
-            label: 'Ultrasounds',
-          ),
+
         ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.amber[800],
-        onTap: _onItemTapped,
       ),
     );
   }

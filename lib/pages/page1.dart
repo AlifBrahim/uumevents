@@ -3,14 +3,56 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-class Page1 extends StatelessWidget {
-  const Page1({Key? key});
+class Page1 extends StatefulWidget {
+  const Page1({Key? key}) : super(key: key);
+
+  @override
+  _Page1State createState() => _Page1State();
+}
+
+class _Page1State extends State<Page1> {
+  List<Event> events = []; // Initialize an empty list to store events
+  bool isLoading = true; // Add a new state variable to track loading status
+
+  @override
+  void initState() {
+    super.initState();
+    fetchEvents(); // Fetch events when the widget is initialized
+  }
+
+  // Function to fetch events from the server
+  Future<void> fetchEvents() async {
+    try {
+      final response =
+          await http.get(Uri.parse('http://146.190.102.198:3000/events'));
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        setState(() {
+          events = data.map((eventData) => Event.fromJson(eventData)).toList();
+          isLoading = false; // Set isLoading to false when data is loaded
+        });
+      } else {
+        print('Failed to load events. Status code: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error fetching events: $error');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(useMaterial3: true),
-      home: const CustomListItemExample(),
+    return Scaffold(
+      appBar: AppBar(title: const Text('Upcoming Events')),
+      body: isLoading // Show progress indicator when isLoading is true
+          ? Center(child: CircularProgressIndicator())
+          : ListView.builder(
+              padding: const EdgeInsets.all(10.0),
+              itemCount: events.length,
+              itemBuilder: (BuildContext context, int index) {
+                return CustomListItemTwo(event: events[index]);
+              },
+            ),
     );
   }
 }
@@ -416,66 +458,6 @@ class _LoveAndShareButtonState extends State<LoveAndShareButton> {
           ),
         ),
       ],
-    );
-  }
-}
-
-class CustomListItemExample extends StatefulWidget {
-  const CustomListItemExample({Key? key});
-
-  @override
-  _CustomListItemExampleState createState() => _CustomListItemExampleState();
-}
-
-class _CustomListItemExampleState extends State<CustomListItemExample> {
-  List<Event> events = []; // Initialize an empty list to store events
-  bool isLoading = true; // Add a new state variable to track loading status
-
-  @override
-  void initState() {
-    super.initState();
-    fetchEvents(); // Fetch events when the widget is initialized
-  }
-
-  @override
-  void didUpdateWidget(covariant CustomListItemExample oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    fetchEvents();
-  }
-
-  // Function to fetch events from the server
-  Future<void> fetchEvents() async {
-    try {
-      final response =
-          await http.get(Uri.parse('http://146.190.102.198:3000/events'));
-
-      if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
-        setState(() {
-          events = data.map((eventData) => Event.fromJson(eventData)).toList();
-          isLoading = false; // Set isLoading to false when data is loaded
-        });
-      } else {
-        print('Failed to load events. Status code: ${response.statusCode}');
-      }
-    } catch (error) {
-      print('Error fetching events: $error');
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Upcoming Events')),
-      body: isLoading // Show progress indicator when isLoading is true
-          ? Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              padding: const EdgeInsets.all(10.0),
-              itemCount: events.length,
-              itemBuilder: (BuildContext context, int index) {
-                return CustomListItemTwo(event: events[index]);
-              },
-            ),
     );
   }
 }

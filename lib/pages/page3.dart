@@ -18,11 +18,11 @@ class _Page3State extends State<Page3> {
     super.initState();
     fetchFavouriteEvents();
   }
-  @override
-  void didUpdateWidget(covariant Page3 oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    fetchFavouriteEvents();
-  }
+  // @override
+  // void didUpdateWidget(covariant Page3 oldWidget) {
+  //   super.didUpdateWidget(oldWidget);
+  //   fetchFavouriteEvents();
+  // }
 
 
   Future<void> fetchFavouriteEvents() async {

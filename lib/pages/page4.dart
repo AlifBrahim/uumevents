@@ -34,6 +34,19 @@ class _Page4State extends State<Page4> {
       // Handle error
     }
   }
+  Future<void> _deleteTicket(Event ticket) async {
+    final profile = await getUserProfile(); // Call the getUserProfile method
+    final response = await http.delete(
+      Uri.parse('http://146.190.102.198:3000/tickets/${ticket.id}/${profile?['matric_no']}'),
+    );
+    if (response.statusCode == 200) {
+      setState(() {
+        _tickets.remove(ticket);
+      });
+    } else {
+      // Handle error
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,32 +96,51 @@ class _Page4State extends State<Page4> {
                         ],
                       ),
                     ),
+                    actions: [
+
+                      TextButton(
+                        onPressed: () async {
+                          await _deleteTicket(ticket);
+                          Navigator.pop(context);
+                        },
+                        child: Text('Delete Ticket'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text('Close'),
+                      ),
+                    ],
                   );
                 },
               );
             },
-            child: Card(
-              child: Row(
-                children: [
-                  Image.network(ticket.poster, width: 100, height: 100),
-                  SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(ticket.name,
-                            style:
-                            TextStyle(fontWeight: FontWeight.bold)),
-                        SizedBox(height: 8),
-                        Text(formattedDate),
-                        SizedBox(height: 8),
-                        Text(ticket.time),
-                        SizedBox(height: 8),
-                        Text(ticket.venue),
-                      ],
+            child: Padding(
+              padding: const EdgeInsets.only(top: 16.0),
+              child: Card(
+                child: Row(
+                  children: [
+                    Image.network(ticket.poster, width: 100, height: 100),
+                    SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(ticket.name,
+                              style:
+                              TextStyle(fontWeight: FontWeight.bold)),
+                          SizedBox(height: 8),
+                          Text(formattedDate),
+                          SizedBox(height: 8),
+                          Text(ticket.time),
+                          SizedBox(height: 8),
+                          Text(ticket.venue),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           );

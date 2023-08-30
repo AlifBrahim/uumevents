@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:uumevents/pages/page4.dart';
 import '../login/Screens/Login/login_screen.dart';
 import 'user_profile.dart'; // Import the getUserProfile method
+import 'page5.dart';
 
 class Page1 extends StatefulWidget {
   const Page1({Key? key}) : super(key: key);
@@ -139,11 +140,14 @@ class EventDetailsPage extends StatefulWidget {
 
 class _EventDetailsPageState extends State<EventDetailsPage> {
   bool _hasTicket = false;
+  bool hasAccount = false;
+
 
   @override
   void initState() {
     super.initState();
     _checkIfEventHasTicket();
+    checkIfUserHasAccount();
   }
 
   Future<void> _checkIfEventHasTicket() async {
@@ -159,6 +163,28 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       });
     } else {
       // Handle error
+    }
+  }
+  Future<void> checkIfUserHasAccount() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        final response =
+        await http.get(Uri.parse('http://146.190.102.198:3000/profiles'));
+        if (response.statusCode == 200) {
+          final List<dynamic> data = json.decode(response.body);
+          final profile =
+          data.firstWhere((profile) => profile['uid'] == user.uid, orElse: () => null);
+          setState(() {
+            hasAccount = profile != null;
+          });
+        } else {
+          print(
+              'Failed to load profiles. Status code: ${response.statusCode}');
+        }
+      }
+    } catch (error) {
+      print('Error checking if user has account: $error');
     }
   }
 
@@ -259,78 +285,117 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
               margin: EdgeInsets.only(right: 30),
               child: ElevatedButton(
                 onPressed: () {
-                  if (_hasTicket) {
-                    // Handle view tickets action
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => Page4()),
-                    );
-                  } else {
-                    // Handle get tickets action
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: Text('Get Tickets'),
-                          content: SingleChildScrollView(
-                            child: ListBody(
-                              children: <Widget>[
-                                Text('Event: ${widget.event.name}'),
-                                Text('Venue: ${widget.event.venue}'),
-                                Text('Date: $formattedDate'),
-                                Text('Time: ${widget.event.time}'),
-                              ],
+                  if (hasAccount) {
+                    if (_hasTicket) {
+                      // Handle view tickets action
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => Page4()),
+                      );
+                    } else {
+                      // Handle get tickets action
+                      showDialog(
+                        context:
+                        context,
+                        builder:
+                            (BuildContext context) {
+                          return AlertDialog(
+                            title:
+                            Text('Get Tickets'),
+                            content:
+                            SingleChildScrollView(
+                              child:
+                              ListBody(
+                                children:
+                                <Widget>[
+                                  Text('Event: ${widget.event.name}'),
+                                  Text('Venue: ${widget.event.venue}'),
+                                  Text('Date: $formattedDate'),
+                                  Text('Time: ${widget.event.time}'),
+                                ],
+                              ),
                             ),
-                          ),
-                          actions: <Widget>[
-                            TextButton(
-                              child: Text('Confirm'),
-                              onPressed: () async {
-                                final profile =
-                                await getUserProfile(); // Call the getUserProfile method
-                                // Handle confirm action
-                                final response = await http.post(
-                                  Uri.parse('http://146.190.102.198:3000/tickets'),
-                                  headers: {
-                                    'Content-Type':
-                                    'application/json; charset=UTF-8',
-                                  },
-                                  body: jsonEncode({
-                                    'event_id': widget.event.id,
-                                    'matric_no': profile?['matric_no'],
-                                  }),
-                                );
-                                if (response.statusCode == 200) {
-                                  // Ticket created successfully
-                                  Navigator.of(context).pop();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content:
-                                      Text('Ticket created successfully!'),
-                                    ),
+                            actions:
+                            <Widget>[
+                              TextButton(
+                                child:
+                                Text('Confirm'),
+                                onPressed:
+                                    () async {
+                                  final profile =
+                                  await getUserProfile(); // Call the getUserProfile method
+                                  // Handle confirm action
+                                  final response =
+                                  await http.post(
+                                    Uri.parse('http://146.190.102.198:3000/tickets'),
+                                    headers:
+                                    {
+                                      'Content-Type':
+                                      'application/json; charset=UTF-8',
+                                    },
+                                    body:
+                                    jsonEncode({
+                                      'event_id':
+                                      widget.event.id,
+                                      'matric_no':
+                                      profile?['matric_no'],
+                                    }),
                                   );
-                                } else {
-                                  // Handle error
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content:
-                                      Text('An error occurred while creating the ticket. Please try again.'),
-                                    ),
-                                  );
-                                }
-                              },
-                            ),
-                            TextButton(
-                              child: Text('Cancel'),
-                              onPressed:
-                                  () {
+                                  if (response.statusCode == 200) {
+                                    // Ticket created successfully
+                                    Navigator.of(context).pop();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content:
+                                        Text('Ticket created successfully!'),
+                                      ),
+                                    );
+                                  } else {
+                                    // Handle error
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content:
+                                        Text('An error occurred while creating the ticket. Please try again.'),
+                                      ),
+                                    );
+                                  }
+                                },
+                              ),
+                              TextButton(
+                                child:
+                                Text('Cancel'),
+                                onPressed:
+                                    () {
                                   Navigator.of(context).pop();
 
-                                  }, // Replace with your cancel action
+                                }, // Replace with your cancel action
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    }
+                  } else {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) => AlertDialog(
+                        title: Text("You haven't created an account yet."),
+                        content:
+                        Text('Please create an account to get tickets.'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => Page5()),
                             ),
-                          ],
-                        );
-                      },
+                            child: Text('Create account'),
+                          ),
+                        ],
+                      ),
                     );
                   }
                 },
@@ -487,7 +552,7 @@ class LoveAndShareButton extends StatefulWidget {
 class _LoveAndShareButtonState extends State<LoveAndShareButton> {
   bool isLoved = false;
   bool isLoggedIn = false;
-
+  bool hasAccount = false;
 
   @override
   void initState() {
@@ -497,6 +562,7 @@ class _LoveAndShareButtonState extends State<LoveAndShareButton> {
       setState(() {
         isLoggedIn = user != null;
       });
+      checkIfUserHasAccount();
     });
   }
 
@@ -522,6 +588,29 @@ class _LoveAndShareButtonState extends State<LoveAndShareButton> {
     }
   }
 
+  Future<void> checkIfUserHasAccount() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        final response =
+        await http.get(Uri.parse('http://146.190.102.198:3000/profiles'));
+        if (response.statusCode == 200) {
+          final List<dynamic> data = json.decode(response.body);
+          final profile =
+          data.firstWhere((profile) => profile['uid'] == user.uid, orElse: () => null);
+          setState(() {
+            hasAccount = profile != null;
+          });
+        } else {
+          print(
+              'Failed to load profiles. Status code: ${response.statusCode}');
+        }
+      }
+    } catch (error) {
+      print('Error checking if user has account: $error');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -529,7 +618,7 @@ class _LoveAndShareButtonState extends State<LoveAndShareButton> {
       children: [
         GestureDetector(
           onTap: () async {
-            if (isLoggedIn) {
+            if (isLoggedIn && hasAccount) {
               setState(() {
                 isLoved = !isLoved;
               });
@@ -564,7 +653,8 @@ class _LoveAndShareButtonState extends State<LoveAndShareButton> {
                   final profile = await getUserProfile(); // Call the getUserProfile method
 
                   final response = await http.delete(
-                    Uri.parse('http://146.190.102.198:3000/favorites/${widget.event.id}/${profile?['matric_no']}'),                    headers: {
+                    Uri.parse('http://146.190.102.198:3000/favorites/${widget.event.id}/${profile?['matric_no']}'),
+                    headers: {
                       'Content-Type': 'application/json',
                     },
                   );
@@ -578,6 +668,28 @@ class _LoveAndShareButtonState extends State<LoveAndShareButton> {
                   print('Error removing event from favourites: $error');
                 }
               }
+            } else if (!hasAccount && isLoggedIn){
+              showDialog(
+                context: context,
+                builder: (BuildContext context) => AlertDialog(
+                  title: Text("You haven't created an account yet."),
+                  content:
+                  Text('Please create an account to like events.'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: Text('Cancel'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => Page5()),
+                      ),
+                      child: Text('Create account'),
+                    ),
+                  ],
+                ),
+              );
             } else {
               showDialog(
                 context: context,

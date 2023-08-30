@@ -100,96 +100,98 @@ class _Page5State extends State<Page5> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Profile')),
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : !_hasAccount
-          ? Form(
-        key: _formKey,
-        child: ListView(
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(title: const Text('Profile')),
+        body: _isLoading
+            ? Center(child: CircularProgressIndicator())
+            : !_hasAccount
+            ? Form(
+          key: _formKey,
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              TextFormField(
+                controller: _matricNoController,
+                decoration:
+                InputDecoration(labelText: 'Matriculation Number'),
+                keyboardType: TextInputType.number,
+                validator: (value) =>
+                value!.isEmpty ? 'Please enter a value' : null,
+              ),
+              TextFormField(
+                controller: _firstNameController,
+                decoration:
+                InputDecoration(labelText: 'First Name'),
+                validator: (value) =>
+                value!.isEmpty ? 'Please enter a value' : null,
+              ),
+              TextFormField(
+                controller: _lastNameController,
+                decoration:
+                InputDecoration(labelText: 'Last Name'),
+                validator: (value) =>
+                value!.isEmpty ? 'Please enter a value' : null,
+              ),
+              TextFormField(
+                controller: _emailAddressController,
+                decoration:
+                InputDecoration(labelText: 'Email Address'),
+                keyboardType: TextInputType.emailAddress,
+                validator: (value) =>
+                value!.isEmpty ? 'Please enter a value' : null,
+              ),
+              TextFormField(
+                controller: _phoneNumberController,
+                decoration:
+                InputDecoration(labelText: 'Phone Number'),
+                keyboardType: TextInputType.phone,
+                validator: (value) =>
+                value!.isEmpty ? 'Please enter a value' : null,
+              ),
+              SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: createAccount,
+                child: Text('Create Account'),
+              ),
+            ],
+          ),
+        )
+            : ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            TextFormField(
-              controller: _matricNoController,
-              decoration:
-              InputDecoration(labelText: 'Matriculation Number'),
-              keyboardType: TextInputType.number,
-              validator: (value) =>
-              value!.isEmpty ? 'Please enter a value' : null,
+            ListTile(
+              title: Text('Matriculation Number'),
+              subtitle: Text(_profile!['matric_no'].toString()),
             ),
-            TextFormField(
-              controller: _firstNameController,
-              decoration:
-              InputDecoration(labelText: 'First Name'),
-              validator: (value) =>
-              value!.isEmpty ? 'Please enter a value' : null,
+            ListTile(
+              title: Text('First Name'),
+              subtitle: Text(_profile!['first_name']),
             ),
-            TextFormField(
-              controller: _lastNameController,
-              decoration:
-              InputDecoration(labelText: 'Last Name'),
-              validator: (value) =>
-              value!.isEmpty ? 'Please enter a value' : null,
+            ListTile(
+              title: Text('Last Name'),
+              subtitle: Text(_profile!['last_name']),
             ),
-            TextFormField(
-              controller: _emailAddressController,
-              decoration:
-              InputDecoration(labelText: 'Email Address'),
-              keyboardType: TextInputType.emailAddress,
-              validator: (value) =>
-              value!.isEmpty ? 'Please enter a value' : null,
+            ListTile(
+              title: Text('Email Address'),
+              subtitle: Text(_profile!['email_address']),
             ),
-            TextFormField(
-              controller: _phoneNumberController,
-              decoration:
-              InputDecoration(labelText: 'Phone Number'),
-              keyboardType: TextInputType.phone,
-              validator: (value) =>
-              value!.isEmpty ? 'Please enter a value' : null,
-            ),
-            SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: createAccount,
-              child: Text('Create Account'),
+            ListTile(
+              title: Text('Phone Number'),
+              subtitle: Text(_profile!['phone_number']),
             ),
           ],
         ),
-      )
-          : ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          ListTile(
-            title: Text('Matriculation Number'),
-            subtitle: Text(_profile!['matric_no'].toString()),
-          ),
-          ListTile(
-            title: Text('First Name'),
-            subtitle: Text(_profile!['first_name']),
-          ),
-          ListTile(
-            title: Text('Last Name'),
-            subtitle: Text(_profile!['last_name']),
-          ),
-          ListTile(
-            title: Text('Email Address'),
-            subtitle: Text(_profile!['email_address']),
-          ),
-          ListTile(
-            title: Text('Phone Number'),
-            subtitle: Text(_profile!['phone_number']),
-          ),
-        ],
-      ),
-      bottomSheet: Padding(
-        padding: const EdgeInsets.all(16),
-        child: ElevatedButton(
-          onPressed: () async {
-            await FirebaseAuth.instance.signOut();
-            // Pop routes until the NavigationExample route is reached
-            Navigator.popUntil(context, ModalRoute.withName('/'));
+        bottomSheet: Padding(
+          padding: const EdgeInsets.all(16),
+          child: ElevatedButton(
+            onPressed: () async {
+              await FirebaseAuth.instance.signOut();
+              // Pop routes until the NavigationExample route is reached
+              Navigator.popUntil(context, ModalRoute.withName('/'));
             },
-          child: Text('Sign Out'),
+            child: Text('Sign Out'),
+          ),
         ),
       ),
     );

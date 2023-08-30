@@ -1,7 +1,12 @@
 import 'dart:convert';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:uumevents/pages/page4.dart';
+import '../login/Screens/Login/login_screen.dart';
+import 'user_profile.dart'; // Import the getUserProfile method
 
 class Page1 extends StatefulWidget {
   const Page1({Key? key}) : super(key: key);
@@ -123,95 +128,221 @@ class Event {
   }
 }
 
-class EventDetailsPage extends StatelessWidget {
+class EventDetailsPage extends StatefulWidget {
   final Event event;
 
   EventDetailsPage({required this.event});
 
   @override
+  _EventDetailsPageState createState() => _EventDetailsPageState();
+}
+
+class _EventDetailsPageState extends State<EventDetailsPage> {
+  bool _hasTicket = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkIfEventHasTicket();
+  }
+
+  Future<void> _checkIfEventHasTicket() async {
+    final profile = await getUserProfile(); // Call the getUserProfile method
+    final response = await http.get(
+      Uri.parse('http://146.190.102.198:3000/tickets?matric_no=${profile?['matric_no']}'),
+    );
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final tickets = data.map<Event>((json) => Event.fromJson(json)).toList();
+      setState(() {
+        _hasTicket = tickets.any((ticket) => ticket.id == widget.event.id);
+      });
+    } else {
+      // Handle error
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // Parse the ISO date string
+    final date = DateFormat('yyyy-MM-dd').parse(widget.event.date);
+    // Format the date to DD-MM-yyyy format
+    final formattedDate = DateFormat('dd-MM-yyyy').format(date);
+
     return Scaffold(
-      appBar: AppBar(title: Text(event.name)),
+      appBar: AppBar(title: Text(widget.event.name)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Container(
-              margin: EdgeInsets.only(bottom: 20.0), // Add margin here
-              child: Center(
-                child: Image.network(
-                  event.poster,
-                  height: 200, // Adjust the height as needed
-                  width: double.infinity, // Make the image take the full width
-                  fit: BoxFit.contain, // Maintain the original aspect ratio
+            children: <Widget>[
+              Container(
+                margin: EdgeInsets.only(bottom: 20.0), // Add margin here
+                child: Center(
+                  child: Image.network(
+                    widget.event.poster,
+                    height: 200, // Adjust the height as needed
+                    width:
+                        double.infinity, // Make the image take the full width
+                    fit: BoxFit.contain, // Maintain the original aspect ratio
+                  ),
                 ),
               ),
-            ),
+              Container(
+                decoration: BoxDecoration(
+                    color: Colors.yellow,
+                    borderRadius: BorderRadius.circular(8)),
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                child: Text(widget.event.type, style: TextStyle(fontSize: 18)),
+              ),
+              Center(
+                  child: Text(widget.event.name,
+                      style: TextStyle(
+                          fontSize: 24, fontWeight: FontWeight.bold))),
+              SizedBox(height: 8),
+              Row(
+                children: [
+                  Container(
+                      decoration: BoxDecoration(
+                          shape: BoxShape.circle, color: Colors.grey[200]),
+                      padding: EdgeInsets.all(8),
+                      child: Icon(Icons.event, size: 32)),
+                  SizedBox(width: 8),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(formattedDate,
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold)),
+                      SizedBox(height: 8),
+                      Text(widget.event.time, style: TextStyle(fontSize: 18)),
+                    ],
+                  ),
+                ],
+              ),
+              SizedBox(height: 8),
+              Text('Venue: ${widget.event.venue}', style: TextStyle(fontSize: 18)),
+              if (widget.event.type == 'Physical')
+                Text('Location: ${widget.event.venue}', style: TextStyle(fontSize: 18))
+              else if (widget.event.type == 'Online')
+                Text('Online Platform: ${widget.event.venue}',
+                    style: TextStyle(fontSize: 18)),
+              if (widget.event.fee.isNotEmpty) SizedBox(height: 8),
+              Text('Fee: ${widget.event.fee}', style: TextStyle(fontSize: 18)),
+              SizedBox(height: 8),
+              if (widget.event.speaker.isNotEmpty)
+                Text('Speaker:${widget.event.speaker}',
+                    style: TextStyle(fontSize: 18)),
+              SizedBox(height: 8),
+              Text('About this event:', style: TextStyle(fontSize: 18)),
+              Container(
+                margin: EdgeInsets.only(
+                    left: 20.0, top: 10.0, bottom: 10.0), // Add margin here
+                child: Text(widget.event.description, style: TextStyle(fontSize: 16)),
+              ),
+              Text('Contact Person:', style: TextStyle(fontSize: 18)),
+              Container(
+                margin: EdgeInsets.only(
+                    left: 20.0, top: 10.0, bottom: 10.0), // Add margin here
+                child:
+                    Text(widget.event.contactPerson, style: TextStyle(fontSize: 16)),
+              ),
+            ],
+        ),
+      ),
+      bottomNavigationBar: BottomAppBar(
+        height: 60,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
             Container(
-              decoration: BoxDecoration(
-                  color: Colors.yellow, borderRadius: BorderRadius.circular(8)),
-              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              child: Text(event.type, style: TextStyle(fontSize: 18)),
-            ),
-            Center(
-                child: Text(event.name,
+              margin: EdgeInsets.only(right: 30),
+              child: ElevatedButton(
+                onPressed: () {
+                  if (_hasTicket) {
+                    // Handle view tickets action
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => Page4()),
+                    );
+                  } else {
+                    // Handle get tickets action
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text('Get Tickets'),
+                          content: SingleChildScrollView(
+                            child: ListBody(
+                              children: <Widget>[
+                                Text('Event: ${widget.event.name}'),
+                                Text('Venue: ${widget.event.venue}'),
+                                Text('Date: $formattedDate'),
+                                Text('Time: ${widget.event.time}'),
+                              ],
+                            ),
+                          ),
+                          actions: <Widget>[
+                            TextButton(
+                              child: Text('Confirm'),
+                              onPressed: () async {
+                                final profile =
+                                await getUserProfile(); // Call the getUserProfile method
+                                // Handle confirm action
+                                final response = await http.post(
+                                  Uri.parse('http://146.190.102.198:3000/tickets'),
+                                  headers: {
+                                    'Content-Type':
+                                    'application/json; charset=UTF-8',
+                                  },
+                                  body: jsonEncode({
+                                    'event_id': widget.event.id,
+                                    'matric_no': profile?['matric_no'],
+                                  }),
+                                );
+                                if (response.statusCode == 200) {
+                                  // Ticket created successfully
+                                  Navigator.of(context).pop();
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content:
+                                      Text('Ticket created successfully!'),
+                                    ),
+                                  );
+                                } else {
+                                  // Handle error
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content:
+                                      Text('An error occurred while creating the ticket. Please try again.'),
+                                    ),
+                                  );
+                                }
+                              },
+                            ),
+                            TextButton(
+                              child: Text('Cancel'),
+                              onPressed:
+                                  () {
+                                  Navigator.of(context).pop();
+
+                                  }, // Replace with your cancel action
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  }
+                },
+                style:
+                ButtonStyle(backgroundColor:
+                MaterialStateProperty.all<Color>(Colors.blue)),
+                child:
+                Text(_hasTicket ? 'View Tickets' : 'Get Tickets',
                     style:
-                        TextStyle(fontSize: 24, fontWeight: FontWeight.bold))),
-            SizedBox(height: 8),
-            Row(
-              children: [
-                Container(
-                    decoration: BoxDecoration(
-                        shape: BoxShape.circle, color: Colors.grey[200]),
-                    padding: EdgeInsets.all(8),
-                    child: Icon(Icons.event, size: 32)),
-                SizedBox(width: 8),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(event.date,
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
-                    SizedBox(height: 8),
-                    Text(event.time, style: TextStyle(fontSize: 18)),
-                  ],
-                ),
-              ],
-            ),
-            SizedBox(height: 8),
-            Text('Venue: ${event.venue}', style: TextStyle(fontSize: 18)),
-            if (event.type == 'Physical')
-              Text('Location: ${event.venue}', style: TextStyle(fontSize: 18))
-            else if (event.type == 'Online')
-              Text('Online Platform: ${event.venue}',
-                  style: TextStyle(fontSize: 18)),
-            if (event.fee.isNotEmpty) SizedBox(height: 8),
-            Text('Fee: ${event.fee}', style: TextStyle(fontSize: 18)),
-            SizedBox(height: 8),
-            if (event.speaker.isNotEmpty)
-              Text('Speaker: ${event.speaker}', style: TextStyle(fontSize: 18)),
-            SizedBox(height: 8),
-            Text('About this event:', style: TextStyle(fontSize: 18)),
-            Container(
-              margin: EdgeInsets.only(
-                  left: 20.0, top: 10.0, bottom: 10.0), // Add margin here
-              child: Text(event.description, style: TextStyle(fontSize: 16)),
-            ),
-            Text('Contact Person:', style: TextStyle(fontSize: 18)),
-            Container(
-              margin: EdgeInsets.only(
-                  left: 20.0, top: 10.0, bottom: 10.0), // Add margin here
-              child: Text(event.contactPerson, style: TextStyle(fontSize: 16)),
-            ),
-            ElevatedButton(
-              onPressed: () {}, // Change text color to white
-              style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all<Color>(
-                      Colors.blue)), // Handle ticket action
-              child: Text('Get Tickets',
-                  style: TextStyle(
-                      color: Colors.white)), // Change button color to blue
+                    TextStyle(color:
+                    Colors.white)),
+              ),
             ),
           ],
         ),
@@ -230,6 +361,10 @@ class CustomListItemTwo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Parse the ISO date string
+    final date = DateFormat('yyyy-MM-dd').parse(event.date);
+    // Format the date to DD-MM-yyyy format
+    final formattedDate = DateFormat('dd-MM-yyyy').format(date);
     return GestureDetector(
       onTap: () {
         // Navigate to the event details page when tapped
@@ -272,7 +407,7 @@ class CustomListItemTwo extends StatelessWidget {
                       padding: const EdgeInsets.fromLTRB(20.0, 0.0, 2.0, 0.0),
                       child: _ArticleDescription(
                         title: event.name,
-                        subtitle: '${event.date} - ${event.time}',
+                        subtitle: '$formattedDate - ${event.time}',
                         venue: event.venue,
                       ),
                     ),
@@ -351,23 +486,30 @@ class LoveAndShareButton extends StatefulWidget {
 
 class _LoveAndShareButtonState extends State<LoveAndShareButton> {
   bool isLoved = false;
+  bool isLoggedIn = false;
+
 
   @override
   void initState() {
     super.initState();
     checkIfEventIsFavourite();
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      setState(() {
+        isLoggedIn = user != null;
+      });
+    });
   }
 
   Future<void> checkIfEventIsFavourite() async {
-    // TODO: Implement a method to check if the event is in the user's favourites
-    // For example, you could make an HTTP GET request to your server's /favourites endpoint and check if the event is in the response data
+    final profile = await getUserProfile(); // Call the getUserProfile method
+
     try {
       final response =
-          await http.get(Uri.parse('http://146.190.102.198:3000/favourites'));
+      await http.get(Uri.parse('http://146.190.102.198:3000/favorites?matric_no=${profile?['matric_no']}'));
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         final favouriteEvents =
-            data.map((eventData) => Event.fromJson(eventData)).toList();
+        data.map((eventData) => Event.fromJson(eventData)).toList();
         setState(() {
           isLoved = favouriteEvents.any((event) => event.id == widget.event.id);
         });
@@ -387,59 +529,77 @@ class _LoveAndShareButtonState extends State<LoveAndShareButton> {
       children: [
         GestureDetector(
           onTap: () async {
-            // Convert the date value to a string in the 'YYYY-MM-DD' format
-            final formattedDate = DateTime.parse(widget.event.date)
-                .toLocal()
-                .toString()
-                .split(' ')[0];
-            setState(() {
-              isLoved = !isLoved;
-            });
-            if (isLoved) {
-              // Send a POST request to the server to add the event to the user's favourites
-              try {
-                final response = await http.post(
-                  Uri.parse('http://146.190.102.198:3000/favourites'),
-                  body: json.encode({
-                    'event': {
-                      ...widget.event.toJson(),
-                      'date': formattedDate, // Use the formatted date value
-                    },
-                  }),
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                );
-                if (response.statusCode == 200) {
-                  print('Successfully added event to favourites');
-                } else {
-                  print(
-                      'Failed to add event to favourites. Status code: ${response.statusCode}');
+            if (isLoggedIn) {
+              setState(() {
+                isLoved = !isLoved;
+              });
+              if (isLoved) {
+                final profile = await getUserProfile(); // Call the getUserProfile method
+                // Send a POST request to the server to add the event to the user's favourites
+                try {
+                  if (profile != null) { // Check if a profile was returned
+                    final response = await http.post(
+                      Uri.parse('http://146.190.102.198:3000/favorites'),
+                      body: json.encode({
+                        'event_id': widget.event.id,
+                        'matric_no': profile['matric_no'], // Use the matric_no value from the profile
+                      }),
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                    );
+                    if (response.statusCode == 200) {
+                      print('Successfully added event to favourites');
+                    } else {
+                      print(
+                          'Failed to add event to favourites. Status code: ${response.statusCode}');
+                    }
+                  }
+                } catch (error) {
+                  print('Error adding event to favourites: $error');
                 }
-              } catch (error) {
-                print('Error adding event to favourites: $error');
+              } else {
+                // Send a DELETE request to the server to remove the event from the user's favourites
+                try {
+                  final profile = await getUserProfile(); // Call the getUserProfile method
+
+                  final response = await http.delete(
+                    Uri.parse('http://146.190.102.198:3000/favorites/${widget.event.id}/${profile?['matric_no']}'),                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                  );
+                  if (response.statusCode == 200) {
+                    print('Successfully removed event from favourites');
+                  } else {
+                    print(
+                        'Failed to remove event from favourites. Status code: ${response.statusCode}');
+                  }
+                } catch (error) {
+                  print('Error removing event from favourites: $error');
+                }
               }
             } else {
-              // Send a DELETE request to the server to remove the event from the user's favourites
-              try {
-                final response = await http.delete(
-                  Uri.parse('http://146.190.102.198:3000/favourites'),
-                  body: json.encode({
-                    'event': widget.event.toJson(),
-                  }),
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                );
-                if (response.statusCode == 200) {
-                  print('Successfully removed event from favourites');
-                } else {
-                  print(
-                      'Failed to remove event from favourites. Status code: ${response.statusCode}');
-                }
-              } catch (error) {
-                print('Error removing event from favourites: $error');
-              }
+              showDialog(
+                context: context,
+                builder: (BuildContext context) => AlertDialog(
+                  title: Text('Not logged in'),
+                  content:
+                  Text('Please log in or sign up to use this feature.'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: Text('Cancel'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => LoginScreen()),
+                      ),
+                      child: Text('Log in'),
+                    ),
+                  ],
+                ),
+              );
             }
           },
           child: Icon(

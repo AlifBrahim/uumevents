@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "95842228240",
+    "project_id": "toastmasters-4168d",
+    "storage_bucket": "toastmasters-4168d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:95842228240:android:e7e13a57885052b0ab1295",
+        "android_client_info": {
+          "package_name": "com.example.uumevents"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "95842228240-rnpe684aejqkc8goacljfvd8gdig5807.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.uumevents",
+            "certificate_hash": "0c15711775f8a344976cd44a70dacff878bf63ea"
+          }
+        },
+        {
+          "client_id": "95842228240-v83jgu1pabhi0ppcb04uisevgftjrvem.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCfku6r5bcS6gD8NR1umIz7Gl3dDKbLdys"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "95842228240-v83jgu1pabhi0ppcb04uisevgftjrvem.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "95842228240-6886b79a6cffibf60n3fukd3t8ghn874.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.uumevents"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

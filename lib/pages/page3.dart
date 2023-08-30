@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'page1.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'user_profile.dart';
 
 class Page3 extends StatefulWidget {
   const Page3({Key? key}) : super(key: key);
@@ -26,8 +27,10 @@ class _Page3State extends State<Page3> {
 
 
   Future<void> fetchFavouriteEvents() async {
+    final profile = await getUserProfile(); // Call the getUserProfile method
+
     try {
-      final response = await http.get(Uri.parse('http://146.190.102.198:3000/favourites'));
+      final response = await http.get(Uri.parse('http://146.190.102.198:3000/favorites?matric_no=${profile?['matric_no']}'));
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         if (mounted) { // Check if the Page3 widget is still mounted

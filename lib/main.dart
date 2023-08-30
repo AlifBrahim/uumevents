@@ -1,18 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'firebase_options.dart';
 import 'pages/page1.dart';
 import 'pages/page2.dart';
 import 'pages/page3.dart';
 import 'pages/page4.dart';
 import 'pages/page5.dart';
 
-void main() => runApp(const NavigationBarApp());
+// Import the LoginRequired widget from login_required.dart
+import 'login_required.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  runApp(const NavigationBarApp());
+}
+// Create a GlobalKey for the NavigationExample widget
+final GlobalKey<_NavigationExampleState> navigationExampleKey =
+GlobalKey<_NavigationExampleState>();
 
 class NavigationBarApp extends StatelessWidget {
   const NavigationBarApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(home: NavigationExample());
+    // Pass the GlobalKey to the NavigationExample widget
+    return MaterialApp(home: NavigationExample(key: navigationExampleKey));
   }
 }
 
@@ -28,17 +44,24 @@ class _NavigationExampleState extends State<NavigationExample> {
   Key page3Key = UniqueKey(); // Add a key for the Page3 widget
 
   Widget _buildPage(int index) {
+    // Check if the user is logged in
+    final User? user = FirebaseAuth.instance.currentUser;
+
     switch (index) {
       case 0:
         return Page1();
       case 1:
         return Page2();
       case 2:
-        return Page3(key: page3Key); // Pass the key to the Page3 widget
+      // Only show Page3 if the user is logged in, otherwise show LoginRequired
+        return user != null ? Page3(key: page3Key) : LoginRequired();
       case 3:
-        return Page4();
+      // Only show Page4 if the user is logged in, otherwise show LoginRequired
+        return user != null ? Page4() : LoginRequired();
       case 4:
-        return Page5();
+      // Only show Page5 if the user is logged in, otherwise show LoginRequired
+        return user != null ? Page5() : LoginRequired();
+
       default:
         return Container();
     }
@@ -46,48 +69,53 @@ class _NavigationExampleState extends State<NavigationExample> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      bottomNavigationBar: Material(
-        elevation: 25.0,
-        child: NavigationBar(
-          elevation: 25.0,
-          labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
-          backgroundColor: Colors.white,
-          height: 40,
-          onDestinationSelected: (int index) {
-            setState(() {
-              currentPageIndex = index;
-              if (index == 2) {
-                page3Key = UniqueKey();
-              }
-            });
-          },
-          selectedIndex: currentPageIndex,
-          destinations: const <NavigationDestination>[
-            NavigationDestination(
-              icon: Icon(Icons.home),
-              label: 'Home',
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        return Scaffold(
+          bottomNavigationBar: Material(
+            elevation: 25.0,
+            child: NavigationBar(
+              elevation: 25.0,
+              labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
+              backgroundColor: Colors.white,
+              height: 40,
+              onDestinationSelected: (int index) {
+                setState(() {
+                  currentPageIndex = index;
+                  if (index == 2) {
+                    page3Key = UniqueKey();
+                  }
+                });
+              },
+              selectedIndex: currentPageIndex,
+              destinations: const <NavigationDestination>[
+                NavigationDestination(
+                  icon: Icon(Icons.home),
+                  label: 'Home',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.search),
+                  label: 'Search',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.favorite),
+                  label: 'Favorites',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.width_full),
+                  label: 'Tickets',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.account_circle),
+                  label: 'Account',
+                ),
+              ],
             ),
-            NavigationDestination(
-              icon: Icon(Icons.search),
-              label: 'Search',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.favorite),
-              label: 'Favorites',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.width_full),
-              label: 'Tickets',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.account_circle),
-              label: 'Account',
-            ),
-          ],
-        ),
-      ),
-      body: _buildPage(currentPageIndex),
+          ),
+          body: _buildPage(currentPageIndex),
+        );
+      },
     );
   }
 }

@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'dart:convert';
-import 'user_profile.dart';
-
-import 'page1.dart';
+import '../functions/get_user_profile.dart';
+import '../components/event_class.dart';
 
 class Page4 extends StatefulWidget {
   @override

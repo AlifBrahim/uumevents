@@ -1,9 +1,8 @@
-// user_profile.dart
-import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
 
-Future<Map<String, dynamic>?> getUserProfile() async {
+Future<bool> checkIfUserHasAccount() async {
   try {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
@@ -13,15 +12,16 @@ Future<Map<String, dynamic>?> getUserProfile() async {
         final List<dynamic> data = json.decode(response.body);
         final profile =
         data.firstWhere((profile) => profile['uid'] == user.uid, orElse: () => null);
-        if (profile != null) {
-          return profile;
-        }
+        return profile != null;
       } else {
         print('Failed to load profiles. Status code: ${response.statusCode}');
+        return false;
       }
+    } else {
+      return false;
     }
   } catch (error) {
-    print('Error retrieving user profile: $error');
+    print('Error checking if user has account: $error');
+    return false;
   }
-  return null;
 }

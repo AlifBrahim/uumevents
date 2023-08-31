@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'page1.dart';
+import '../components/event_list.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'user_profile.dart';
+import '../functions/get_user_profile.dart';
+import '../components/event_class.dart';
+
 
 class Page3 extends StatefulWidget {
   const Page3({Key? key}) : super(key: key);

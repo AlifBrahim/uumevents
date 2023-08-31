@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
-import 'pages/page1.dart';
-import 'pages/page2.dart';
-import 'pages/page3.dart';
-import 'pages/page4.dart';
-import 'pages/page5.dart';
+import 'pages/homepage.dart';
+import 'pages/search_page.dart';
+import 'pages/favorites_page.dart';
+import 'pages/tickets_page.dart';
+import 'pages/profile_page.dart';
 
 // Import the LoginRequired widget from login_required.dart
-import 'login_required.dart';
+import 'components/login_required.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

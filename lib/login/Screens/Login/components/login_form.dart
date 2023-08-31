@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '/pages/page1.dart';
+import '/pages/homepage.dart';
 import '/main.dart';
 import '../../../components/already_have_an_account_acheck.dart';
 import '../../../constants.dart';

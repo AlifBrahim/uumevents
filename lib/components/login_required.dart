@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../login/Screens/Login/login_screen.dart';
+import '../../login/Screens/Login/login_screen.dart';
 
 class LoginRequired extends StatelessWidget {
   const LoginRequired({Key? key}) : super(key: key);

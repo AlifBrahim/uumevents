@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:uumevents/pages/page1.dart';
+import '../components/event_list.dart';
+import '../components/event_class.dart';
+
 
 class Page2 extends StatefulWidget {
   const Page2({Key? key});

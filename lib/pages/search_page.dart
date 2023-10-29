@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import '../components/event_list.dart';
 import '../components/event_class.dart';
+import '../functions/event_fetcher.dart';
 
 
-class Page2 extends StatefulWidget {
-  const Page2({Key? key});
+class SearchPage extends StatefulWidget {
+  const SearchPage({Key? key});
 
   @override
-  _Page2State createState() => _Page2State();
+  _SearchPageState createState() => _SearchPageState();
 }
 
-class _Page2State extends State<Page2> {
+class _SearchPageState extends State<SearchPage> {
   final TextEditingController _searchController = TextEditingController();
   List<Event> events = [];
   List<Event> filteredEvents = [];
@@ -25,22 +24,11 @@ class _Page2State extends State<Page2> {
 
   // Function to fetch events from the server
   Future<void> fetchEvents() async {
-    try {
-      final response =
-      await http.get(Uri.parse('http://146.190.102.198:3000/events'));
-
-      if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
-        setState(() {
-          events = data.map((eventData) => Event.fromJson(eventData)).toList();
-          filteredEvents = events;
-        });
-      } else {
-        print('Failed to load events. Status code: ${response.statusCode}');
-      }
-    } catch (error) {
-      print('Error fetching events: $error');
-    }
+    final fetchedEvents = await EventService.fetchEvents();
+    setState(() {
+      events = fetchedEvents;
+      filteredEvents = events;
+    });
   }
 
   void _onSearchTextChanged(String text) {

@@ -11,6 +11,7 @@ class Event {
   final String description;
   final String contactPerson;
   final String tickets;
+  final int organizerId; // Optional
 
   Event({
     required this.id, // Initialize the id property in the constructor
@@ -25,6 +26,7 @@ class Event {
     required this.description,
     required this.contactPerson,
     required this.tickets,
+    required this.organizerId,
   });
 
   // Update the fromJson factory constructor to parse the id property from JSON data
@@ -42,6 +44,7 @@ class Event {
       description: json['description'],
       contactPerson: json['contactPerson'],
       tickets: json['tickets'],
+      organizerId: json['organizer_id'],
     );
   }
 
@@ -60,6 +63,7 @@ class Event {
       'description': description,
       'contactPerson': contactPerson,
       'tickets': tickets,
+      'organizer_id': organizerId,
     };
   }
 }

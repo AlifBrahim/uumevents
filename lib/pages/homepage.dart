@@ -7,14 +7,14 @@ import '../components/event_details.dart';
 import '../components/event_list.dart';
 
 
-class Page1 extends StatefulWidget {
-  const Page1({Key? key}) : super(key: key);
+class Homepage extends StatefulWidget {
+  const Homepage({Key? key}) : super(key: key);
 
   @override
-  _Page1State createState() => _Page1State();
+  _HomepageState createState() => _HomepageState();
 }
 
-class _Page1State extends State<Page1> {
+class _HomepageState extends State<Homepage> {
   List<Event> events = []; // Initialize an empty list to store events
   bool isLoading = true; // Add a new state variable to track loading status
 

@@ -6,14 +6,14 @@ import '../functions/get_user_profile.dart';
 import '../components/event_class.dart';
 
 
-class Page3 extends StatefulWidget {
-  const Page3({Key? key}) : super(key: key);
+class FavoritesPage extends StatefulWidget {
+  const FavoritesPage({Key? key}) : super(key: key);
 
   @override
-  _Page3State createState() => _Page3State();
+  _FavoritesPageState createState() => _FavoritesPageState();
 }
 
-class _Page3State extends State<Page3> {
+class _FavoritesPageState extends State<FavoritesPage> {
   List<Event> favouriteEvents = [];
 
   @override
@@ -21,18 +21,11 @@ class _Page3State extends State<Page3> {
     super.initState();
     fetchFavouriteEvents();
   }
-  // @override
-  // void didUpdateWidget(covariant Page3 oldWidget) {
-  //   super.didUpdateWidget(oldWidget);
-  //   fetchFavouriteEvents();
-  // }
-
-
   Future<void> fetchFavouriteEvents() async {
     final profile = await getUserProfile(); // Call the getUserProfile method
 
     try {
-      final response = await http.get(Uri.parse('http://146.190.102.198:3000/favorites?matric_no=${profile?['matric_no']}'));
+      final response = await http.get(Uri.parse('http://146.190.102.198:3001/favorites?matric_no=${profile?['matric_no']}'));
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         if (mounted) { // Check if the Page3 widget is still mounted

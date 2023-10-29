@@ -3,14 +3,14 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 
-class Page5 extends StatefulWidget {
-  const Page5({Key? key}) : super(key: key);
+class ProfilePage extends StatefulWidget {
+  const ProfilePage({Key? key}) : super(key: key);
 
   @override
-  _Page5State createState() => _Page5State();
+  _ProfilePageState createState() => _ProfilePageState();
 }
 
-class _Page5State extends State<Page5> {
+class _ProfilePageState extends State<ProfilePage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _matricNoController = TextEditingController();
   final TextEditingController _firstNameController = TextEditingController();
@@ -36,7 +36,7 @@ class _Page5State extends State<Page5> {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         final response =
-        await http.get(Uri.parse('http://146.190.102.198:3000/profiles'));
+        await http.get(Uri.parse('http://146.190.102.198:3001/profiles'));
         if (response.statusCode == 200) {
           final List<dynamic> data = json.decode(response.body);
           final profile =
@@ -70,7 +70,7 @@ class _Page5State extends State<Page5> {
         final user = FirebaseAuth.instance.currentUser;
         if (user != null) {
           final response = await http.post(
-            Uri.parse('http://146.190.102.198:3000/profiles'),
+            Uri.parse('http://146.190.102.198:3001/profiles'),
             body: json.encode({
               'matric_no': int.tryParse(_matricNoController.text),
               'first_name': _firstNameController.text,

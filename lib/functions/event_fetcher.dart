@@ -6,7 +6,7 @@ class EventService {
   static Future<List<Event>> fetchEvents() async {
     try {
       final response =
-      await http.get(Uri.parse('http://146.190.102.198:3000/events'));
+      await http.get(Uri.parse('http://146.190.102.198:3001/events'));
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);

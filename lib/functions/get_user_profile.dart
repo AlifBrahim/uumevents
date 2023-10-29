@@ -8,7 +8,7 @@ Future<Map<String, dynamic>?> getUserProfile() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       final response =
-      await http.get(Uri.parse('http://146.190.102.198:3000/profiles'));
+      await http.get(Uri.parse('http://146.190.102.198:3001/profiles'));
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         final profile =

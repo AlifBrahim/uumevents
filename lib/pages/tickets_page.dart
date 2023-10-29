@@ -4,13 +4,14 @@ import 'package:intl/intl.dart';
 import 'dart:convert';
 import '../functions/get_user_profile.dart';
 import '../components/event_class.dart';
+import '../components/ticket/ticket_ui_widget.dart';
 
-class Page4 extends StatefulWidget {
+class TicketsPage extends StatefulWidget {
   @override
-  _Page4State createState() => _Page4State();
+  _TicketsPageState createState() => _TicketsPageState();
 }
 
-class _Page4State extends State<Page4> {
+class _TicketsPageState extends State<TicketsPage> {
   List<Event> _tickets = [];
 
   @override
@@ -22,7 +23,7 @@ class _Page4State extends State<Page4> {
   Future<void> _getTickets() async {
     final profile = await getUserProfile(); // Call the getUserProfile method
     final response = await http.get(
-      Uri.parse('http://146.190.102.198:3000/tickets?matric_no=${profile?['matric_no']}'),
+      Uri.parse('http://146.190.102.198:3001/tickets?matric_no=${profile?['matric_no']}'),
     );
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -36,7 +37,7 @@ class _Page4State extends State<Page4> {
   Future<void> _deleteTicket(Event ticket) async {
     final profile = await getUserProfile(); // Call the getUserProfile method
     final response = await http.delete(
-      Uri.parse('http://146.190.102.198:3000/tickets/${ticket.id}/${profile?['matric_no']}'),
+      Uri.parse('http://146.190.102.198:3001/tickets/${ticket.id}/${profile?['matric_no']}'),
     );
     if (response.statusCode == 200) {
       setState(() {
@@ -115,32 +116,13 @@ class _Page4State extends State<Page4> {
                 },
               );
             },
-            child: Padding(
-              padding: const EdgeInsets.only(top: 16.0),
-              child: Card(
-                child: Row(
-                  children: [
-                    Image.network(ticket.poster, width: 100, height: 100),
-                    SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(ticket.name,
-                              style:
-                              TextStyle(fontWeight: FontWeight.bold)),
-                          SizedBox(height: 8),
-                          Text(formattedDate),
-                          SizedBox(height: 8),
-                          Text(ticket.time),
-                          SizedBox(height: 8),
-                          Text(ticket.venue),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            child:
+            TicketUi( // Use the TicketUi widget instead of a Card widget
+              name: ticket.name,
+              date: formattedDate,
+              time: ticket.time,
+              venue: ticket.venue,
+              description: ticket.description,
             ),
           );
         },

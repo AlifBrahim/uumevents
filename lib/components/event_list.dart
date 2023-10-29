@@ -17,8 +17,11 @@ class CustomListItemTwo extends StatelessWidget {
   Widget build(BuildContext context) {
     // Parse the ISO date string
     final date = DateFormat('yyyy-MM-dd').parse(event.date);
-    // Format the date to DD-MM-yyyy format
-    final formattedDate = DateFormat('dd-MM-yyyy').format(date);
+    final day = DateFormat('EEEE', 'en_US').format(date);
+    final formattedDate = DateFormat('dd/MM/yyyy').format(date);
+    final formattedTime = DateFormat('hh:mm a').format(DateFormat('HH:mm:ss').parse(event.time));
+
+
     return GestureDetector(
       onTap: () {
         // Navigate to the event details page when tapped
@@ -34,7 +37,7 @@ class CustomListItemTwo extends StatelessWidget {
           alignment: Alignment.bottomRight,
           children: [
             SizedBox(
-              height: 100,
+              height: 120,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
@@ -63,7 +66,7 @@ class CustomListItemTwo extends StatelessWidget {
                       child: ArticleDescription(
                         title: event.name,
                         subtitle:
-                        '$formattedDate - ${event.time}',
+                        '$day • $formattedDate • $formattedTime',
                         venue: event.venue,
                       ),
                     ),
@@ -121,7 +124,7 @@ class ArticleDescription extends StatelessWidget {
           ),
         ),
         Text(
-          venue,
+          venue.length > 22 ? '${venue.substring(0, 22)}...' : venue,
           style: const TextStyle(
             fontSize: 12.0,
             color: Colors.black87,
@@ -131,4 +134,5 @@ class ArticleDescription extends StatelessWidget {
     );
   }
 }
+
 

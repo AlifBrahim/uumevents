@@ -6,7 +6,7 @@ import 'get_user_profile.dart';
 Future<bool> checkIfEventHasTicket(eventId) async {
   final profile = await getUserProfile();
   final response = await http.get(
-    Uri.parse('http://146.190.102.198:3000/tickets?matric_no=${profile?['matric_no']}'),
+    Uri.parse('http://146.190.102.198:3001/tickets?matric_no=${profile?['matric_no']}'),
   );
   if (response.statusCode == 200) {
     final data = jsonDecode(response.body);

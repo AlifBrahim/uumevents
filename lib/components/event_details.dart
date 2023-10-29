@@ -101,14 +101,49 @@ class EventDetailsHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Container(
-          margin: EdgeInsets.only(bottom: 20.0),
-          child: Center(
-            child: Image.network(
-              poster,
-              height: 200,
-              width: double.infinity,
-              fit: BoxFit.contain,
+        GestureDetector(
+          onTap: () {
+            showDialog(
+              context: context,
+              builder: (context) {
+                return Stack(
+                  children: [
+                    Center(
+                      child: InteractiveViewer(
+                        child: Image.network(
+                          poster,
+                          height: double.infinity,
+                          width: double.infinity,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      top: 20,
+                      right: 20,
+                      child: Material(
+                        type: MaterialType.transparency,
+                        child: IconButton(
+                          color: Colors.white,
+                          icon: Icon(Icons.close),
+                          onPressed: () => Navigator.of(context).pop(),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+          child: Container(
+            margin: EdgeInsets.only(bottom: 20.0),
+            child: Center(
+              child: Image.network(
+                poster,
+                height: 300,
+                width: double.infinity,
+                fit: BoxFit.contain,
+              ),
             ),
           ),
         ),
@@ -118,12 +153,16 @@ class EventDetailsHeader extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           child: Text(type, style: TextStyle(fontSize: 18)),
         ),
+        SizedBox(height: 8),
         Center(
             child:
             Text(name, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold))),
+        SizedBox(height: 8),
       ],
     );
   }
+
+
 }
 
 class EventDetailsDateAndTime extends StatelessWidget {
@@ -135,7 +174,9 @@ class EventDetailsDateAndTime extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final parsedDate = DateFormat('yyyy-MM-dd').parse(date);
-    final formattedDate = DateFormat('dd-MM-yyyy').format(parsedDate);
+    final formattedDate = DateFormat('dd/MM/yyyy').format(parsedDate);
+    final day = DateFormat('EEEE', 'en_US').format(parsedDate);
+    final formattedTime = DateFormat('hh:mm a').format(DateFormat('HH:mm:ss').parse(time));
 
     return Row(
       children: [
@@ -144,14 +185,14 @@ class EventDetailsDateAndTime extends StatelessWidget {
             BoxDecoration(shape: BoxShape.circle, color: Colors.grey[200]),
             padding: EdgeInsets.all(8),
             child: Icon(Icons.event, size: 32)),
-        SizedBox(width: 8),
+        SizedBox(width: 10),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(formattedDate,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text('$day • $formattedDate',
+                style: TextStyle(fontSize: 18,)),
             SizedBox(height: 8),
-            Text(time, style: TextStyle(fontSize: 18)),
+            Text(formattedTime, style: TextStyle(fontSize: 18)),
           ],
         ),
       ],
@@ -171,18 +212,22 @@ class EventDetailsVenue extends StatelessWidget {
         crossAxisAlignment:
         CrossAxisAlignment.start,
         children:[
-          Text('Venue:$venue', style:
-          TextStyle(fontSize:
-          18)),
-          if (type == 'Physical')
-            Text('Location:$venue', style:
-            TextStyle(fontSize:
-            18))
-          else if (type == 'Online')
-            Text('Online Platform:$venue',
-                style:
-                TextStyle(fontSize:
-                18)),
+          SizedBox(height:8),
+          Row(
+            children: [
+              Container(
+                  decoration:
+                  BoxDecoration(shape: BoxShape.circle, color: Colors.grey[200]),
+                  padding: EdgeInsets.all(8),
+                  child: Icon(Icons.location_on, size: 32)),
+              SizedBox(width: 10),
+              Text(venue, style:
+              TextStyle(fontSize:
+              18)),
+            ],
+          ),
+          SizedBox(height: 8),
+
         ]
     );
   }
@@ -200,15 +245,21 @@ class EventDetailsFeeAndSpeaker extends StatelessWidget {
         crossAxisAlignment:
         CrossAxisAlignment.start,
         children:[
-          if (fee.isNotEmpty) SizedBox(height:
-          8),
-          Text('Fee:$fee', style:
-          TextStyle(fontSize:
-          18)),
-          SizedBox(height:
-          8),
+          Row(
+            children: [
+              Container(
+                  decoration:
+                  BoxDecoration(shape: BoxShape.circle, color: Colors.grey[200]),
+                  padding: EdgeInsets.all(8),
+                  child: Icon(Icons.attach_money, size: 32)),
+              SizedBox(width: 10),
+              if (fee.isNotEmpty)
+                Text(fee, style: TextStyle(fontSize: 18)),
+            ],
+          ),
+          SizedBox(height: 15),
           if (speaker.isNotEmpty)
-            Text('Speaker:$speaker',
+            Text('Speaker: $speaker',
                 style:
                 TextStyle(fontSize:
                 18)),
@@ -228,11 +279,8 @@ class EventDetailsDescription extends StatelessWidget {
         crossAxisAlignment:
         CrossAxisAlignment.start,
         children:[
-          SizedBox(height:
-          8),
-          Text('About this event:', style:
-          TextStyle(fontSize:
-          18)),
+          SizedBox(height: 15),
+          Text('About this event:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           Container(
             margin:
             EdgeInsets.only(left:
@@ -261,6 +309,7 @@ class EventDetailsContactPerson extends StatelessWidget {
         crossAxisAlignment:
         CrossAxisAlignment.start,
         children:[
+          SizedBox(height: 15),
           Text('Contact Person:', style:
           TextStyle(fontSize:
           18)),
@@ -321,7 +370,7 @@ class EventDetailsBottomAppBar extends StatelessWidget {
                     // Handle view tickets action
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => Page4()),
+                      MaterialPageRoute(builder: (context) => TicketsPage()),
                     );
                   } else {
                     // Handle get tickets action
@@ -358,7 +407,7 @@ class EventDetailsBottomAppBar extends StatelessWidget {
                                 // Handle confirm action
                                 final response =
                                 await http.post(
-                                  Uri.parse('http://146.190.102.198:3000/tickets'),
+                                  Uri.parse('http://146.190.102.198:3001/tickets'),
                                   headers:
                                   {
                                     'Content-Type':
@@ -421,7 +470,7 @@ class EventDetailsBottomAppBar extends StatelessWidget {
                         TextButton(
                           onPressed: () => Navigator.pushReplacement(
                             context,
-                            MaterialPageRoute(builder: (context) => Page5()),
+                            MaterialPageRoute(builder: (context) => ProfilePage()),
                           ),
                           child: Text('Create account'),
                         ),

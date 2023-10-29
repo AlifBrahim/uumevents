@@ -39,7 +39,7 @@ class _LoveAndShareButtonState extends State<LoveAndShareButton> {
 
     try {
       final response =
-      await http.get(Uri.parse('http://146.190.102.198:3000/favorites?matric_no=${profile?['matric_no']}'));
+      await http.get(Uri.parse('http://146.190.102.198:3001/favorites?matric_no=${profile?['matric_no']}'));
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         final favouriteEvents =
@@ -61,7 +61,7 @@ class _LoveAndShareButtonState extends State<LoveAndShareButton> {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         final response =
-        await http.get(Uri.parse('http://146.190.102.198:3000/profiles'));
+        await http.get(Uri.parse('http://146.190.102.198:3001/profiles'));
         if (response.statusCode == 200) {
           final List<dynamic> data = json.decode(response.body);
           final profile =
@@ -96,7 +96,7 @@ class _LoveAndShareButtonState extends State<LoveAndShareButton> {
                 try {
                   if (profile != null) { // Check if a profile was returned
                     final response = await http.post(
-                      Uri.parse('http://146.190.102.198:3000/favorites'),
+                      Uri.parse('http://146.190.102.198:3001/favorites'),
                       body: json.encode({
                         'event_id': widget.event.id,
                         'matric_no': profile['matric_no'], // Use the matric_no value from the profile
@@ -121,7 +121,7 @@ class _LoveAndShareButtonState extends State<LoveAndShareButton> {
                   final profile = await getUserProfile(); // Call the getUserProfile method
 
                   final response = await http.delete(
-                    Uri.parse('http://146.190.102.198:3000/favorites/${widget.event.id}/${profile?['matric_no']}'),
+                    Uri.parse('http://146.190.102.198:3001/favorites/${widget.event.id}/${profile?['matric_no']}'),
                     headers: {
                       'Content-Type': 'application/json',
                     },
@@ -151,7 +151,7 @@ class _LoveAndShareButtonState extends State<LoveAndShareButton> {
                     TextButton(
                       onPressed: () => Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => Page5()),
+                        MaterialPageRoute(builder: (context) => ProfilePage()),
                       ),
                       child: Text('Create account'),
                     ),
